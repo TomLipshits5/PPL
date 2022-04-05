@@ -7,11 +7,21 @@ describe("Find", () => {
         it("returns a Failure when no element was found", () => {
             const result = F.findResult(x => x.length > 3, ["dog", "cat", "rat"]);
             expect(result).to.satisfy(R.isFailure);
+            const result2 = F.findResult(x => x > 3, [0,1,2]);
+            expect(result).to.satisfy(R.isFailure);
+
+
         });
 
         it("returns an Ok when an element was found", () => {
             const result = F.findResult(x => x.length > 3, ["raccoon", "ostrich", "slug"]);
             expect(result).to.satisfy(R.isOk);
+            const result1 = F.findResult(x=>x.length > 3, ["dog1", "c1at", "r1at"])
+            expect(result1).to.satisfy(R.isOk);
+            //@ts-ignore
+            const result2 = F.findResult(x=>x.length > 3, [])
+            expect(result1).to.satisfy(R.isOk);
+
         });
     });
 
@@ -24,6 +34,9 @@ describe("Find", () => {
         it("return a Failure if no even numbers are in the array in v2", () => {
            const result = F.returnSquaredIfFoundEven_v2([1, 3, 5]);
            expect(result).to.satisfy(R.isFailure);
+            const result1 = F.returnSquaredIfFoundEven_v2([]);
+            expect(result).to.satisfy(R.isFailure);
+
         });
 
         it("returns the first even number squared in v3", () => {
@@ -32,6 +45,8 @@ describe("Find", () => {
 
         it("returns -1 if no even numbers are in the array in v3", () => {
             expect(F.returnSquaredIfFoundEven_v3([1, 3, 5])).to.equal(-1);
+            expect(F.returnSquaredIfFoundEven_v3([])).to.equal(-1);
+
         });
     });
 });
