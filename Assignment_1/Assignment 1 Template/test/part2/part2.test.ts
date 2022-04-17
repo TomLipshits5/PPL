@@ -13,6 +13,7 @@ describe("Assignment 1 Part 2", () => {
             expect(countLetters("aaammmmMMMMmmmmjjjjaj")).to.deep.equal({ "a": 4, "m": 12, "j":5});
             expect(countLetters("2227777338883888")).to.deep.equal({"2": 3, "7": 4, "3": 3, "8":6});
         });
+
     });
 
     describe("isPaired", () => {
