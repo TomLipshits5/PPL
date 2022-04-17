@@ -1,36 +1,36 @@
 (define make-ok
   (lambda (val)
-    @TODO
+    (cons "ok" val)
   )
  )
  
 (define make-error
   (lambda (msg)
-    @TODO
+    (cons "error" val)
   )
  )
 
 (define ok?
   (lambda (res)
-    @TODO
+    (and (pair? res) (eq? (car res) "ok"))
   )
  )
 
 (define error?
   (lambda (res)
-    @TODO
+    (and (pair? res) (eq? (car res) "error"))
   )
  )
 
 (define result?
   (lambda (res)
-    @TODO
+    (or (ok? res) (error? res))
   )
  )
 
 (define result->val
   (lambda (res)
-    @TODO
+    (if (result? res)(cdr res)"Not a result")
   )
 )
 
