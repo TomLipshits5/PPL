@@ -3,7 +3,7 @@
     (cons "ok" val)
   )
  )
- 
+
 (define make-error
   (lambda (msg)
     (cons "error" val)
@@ -34,33 +34,42 @@
   )
 )
 
-(define bind 
+(define bind
   (lambda (f)
-    @TODO
+    (lambda (res)
+        (if (ok? res) (f (result->val res) res)
+    )
   )
 )
 
 (define make-dict
   (lambda ()
-    @TODO
+    (list (cons "dict"))
   )
 )
 
 (define dict?
   (lambda (e)
-    @TODO
+    (eq? (car(car e)) "dict")
   )
 )
 
 (define get
   (lambda (dict k)
-    @TODO
+    (if (eq? (car(car dict)) k) (make-ok(cdr(car dict)))
+    (if (empty? (cdr dict)) (make-error "Key not found") (get (cdr dict) k))
+    )
   )
 )
 
 (define put
   (lambda (dict k v)
-    @TODO
+    (if (or (eq? (car(car dict)) k) (empty? (cdr dict)))
+        (if (eq? (car(car dict)) k)
+            (= (cdr (car dict)) v)
+        ())
+    (//elseMissing))
+
   )
 )
 
