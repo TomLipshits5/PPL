@@ -42,37 +42,69 @@
   )
 )
 
+
 (define make-dict
   (lambda ()
-    (list (cons "dict"))
+    (list  (cons "dict" "dict"))
   )
 )
+
 
 (define dict?
-  (lambda (e)
-    (eq? (car(car e)) "dict")
+ (lambda (e)
+   (if (pair? e)
+       (if (pair? (car e)) (eq? (car(car e)) "dict")
+           #f)
+       #f)
   )
-)
+ )
 
-(define get
-  (lambda (dict k)
-    (if (eq? (car(car dict)) k) (make-ok(cdr(car dict)))
-    (if (empty? (cdr dict)) (make-error "Key not found") (get (cdr dict) k))
+(define put-rec
+  (lambda (dict k v)
+    (if (eq? (car(car dict)) k)
+        (if (eq? (cdr dict) null)
+            (list (cons k v))
+            (cons (cons k v) (cdr dict)))
+
+        (if (eq? (cdr dict) null)
+            (list (car dict) (cons k v))
+            (cons (car dict) (put-rec (cdr dict) k v))
+          )
+       )
     )
-  )
-)
+ )
 
 (define put
   (lambda (dict k v)
-    (if (or (eq? (car(car dict)) k) (empty? (cdr dict)))
-        (if (eq? (car(car dict)) k)
-            (= (cdr (car dict)) v)
-        ())
-    (//elseMissing))
-
+    (if (dict? dict)
+        (make-ok(put-rec dict k v))
+        (make-error "ERROR on procedure put: not a dict")
+        )
+   )
   )
-)
 
+(define get
+  (lambda (dict k)
+    (if (dict? dict)
+        (get-rec dict k )
+        (make-error "ERROR on procedure get: not a dict")
+        )
+   )
+  )
+
+(define get-rec
+  (lambda (dict k)
+    (if (eq? (car(car dict)) k)
+        (make-ok(cdr(car dict)))
+        (if (eq? (cdr dict) null)
+            (make-error "Key not found")
+        (get-rec (cdr dict) k)
+
+        )
+       )
+
+    )
+  )
 (define map-dict
   (lambda (dict f)
     @TODO
