@@ -61,23 +61,22 @@
 (define put-rec
   (lambda (dict k v)
     (if (eq? (car(car dict)) k)
-        (if (eq? (cdr dict) null)
+        (if (empty? (cdr dict))
             (list (cons k v))
             (cons (cons k v) (cdr dict)))
 
-        (if (eq? (cdr dict) null)
+        (if (empty? (cdr dict))
             (list (car dict) (cons k v))
             (cons (car dict) (put-rec (cdr dict) k v))
           )
        )
     )
  )
-
 (define put
   (lambda (dict k v)
     (if (dict? dict)
         (make-ok(put-rec dict k v))
-        (make-error "ERROR on procedure put: not a dict")
+        (make-error "Error: not a dictionary")
         )
    )
   )
@@ -86,7 +85,7 @@
   (lambda (dict k)
     (if (dict? dict)
         (get-rec dict k )
-        (make-error "ERROR on procedure get: not a dict")
+        (make-error "Error: not a dictionary")
         )
    )
   )
@@ -95,8 +94,8 @@
   (lambda (dict k)
     (if (eq? (car(car dict)) k)
         (make-ok(cdr(car dict)))
-        (if (eq? (cdr dict) null)
-            (make-error "Key not found")
+        (if (empty? (cdr dict))
+            (make-ok "Key not found")
         (get-rec (cdr dict) k)
 
         )
@@ -113,31 +112,32 @@
 
 (define map-dict-rec
   (lambda (dict f)
-    (if (eq? (cdr dict) null)
+    (if (empty? (cdr dict))
         (list (cons (car(car dict)) (f(cdr(car dict)))))
         (cons (cons (car(car dict)) (f(cdr(car dict)))) (map-dict-rec (cdr dict) f))
         )
   )
 )
 
+
 (define map-dict
   (lambda (dict f)
-    (if (dict? dict) (make-ok (make-dict-from-pairs (filter-dict-rec (cdr dict) f))) (make-error "ERROR on procedure map-dict: not a dict"))
+    (if (dict? dict) (make-ok (make-dict-from-pairs (map-dict-rec (cdr dict) f))) (make-error "Error: not a dictionary"))
     )
   )
 
 (define filter-dict-rec
   (lambda (dict pred)
-    (if (eq? (cdr dict) null)
-        (if (pred (cdr(car dict))) (list(car dict)) (cdr dict))
-        (if (pred (cdr(car dict))) (cons (car dict) (filter-dict-rec (cdr dict) pred)) (filter-dict-rec (cdr dict) pred))
+    (if (empty? (cdr dict))
+        (if (pred (car(car dict)) (cdr(car dict))) (list(car dict)) (cdr dict))
+        (if (pred (car(car dict)) (cdr(car dict))) (cons (car dict) (filter-dict-rec (cdr dict) pred)) (filter-dict-rec (cdr dict) pred))
         )
    )
  )
 
 (define filter-dict
   (lambda (dict pred)
-    (if (dict? dict) (make-ok (make-dict-from-pairs (filter-dict-rec (cdr dict) pred))) (make-error "ERROR on procedure filter-dict: not a dict"))
+    (if (dict? dict) (make-ok (make-dict-from-pairs (filter-dict-rec (cdr dict) pred))) (make-error "Error: not a dictionary"))
   )
 )
 
