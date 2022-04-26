@@ -105,14 +105,39 @@
 
     )
   )
-(define map-dict
+
+(define make-dict-from-pairs
+  (lambda (lst)
+    (cons (cons "dict" "dict") lst)
+    )
+  )
+
+(define map-dict-rec
   (lambda (dict f)
-    @TODO
+    (if (eq? (cdr dict) null)
+        (list (cons (car(car dict)) (f(cdr(car dict)))))
+        (cons (cons (car(car dict)) (f(cdr(car dict)))) (map-dict-rec (cdr dict) f))
+        )
   )
 )
 
+(define map-dict
+  (lambda (dict f)
+    (if (dict? dict) (make-ok (make-dict-from-pairs (filter-dict-rec (cdr dict) f))) (make-error "ERROR on procedure map-dict: not a dict"))
+    )
+  )
+
+(define filter-dict-rec
+  (lambda (dict pred)
+    (if (eq? (cdr dict) null)
+        (if (pred (cdr(car dict))) (list(car dict)) (cdr dict))
+        (if (pred (cdr(car dict))) (cons (car dict) (filter-dict-rec (cdr dict) pred)) (filter-dict-rec (cdr dict) pred))
+        )
+   )
+ )
+
 (define filter-dict
   (lambda (dict pred)
-    @TODO
+    (if (dict? dict) (make-ok (make-dict-from-pairs (filter-dict-rec (cdr dict) pred))) (make-error "ERROR on procedure filter-dict: not a dict"))
   )
 )
