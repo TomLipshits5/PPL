@@ -6,19 +6,19 @@
 
 (define make-error
   (lambda (msg)
-    (cons "error" val)
+    (cons "error" msg)
   )
  )
 
 (define ok?
   (lambda (res)
-    (and (pair? res) (eq? (car res) "ok"))
+    (if (pair? res) (eq? (car res) "ok") #f)
   )
  )
 
 (define error?
   (lambda (res)
-    (and (pair? res) (eq? (car res) "error"))
+    (if (pair? res) (eq? (car res) "error") #f)
   )
  )
 
@@ -37,11 +37,10 @@
 (define bind
   (lambda (f)
     (lambda (res)
-        (if (ok? res) (f (result->val res) res)
-    )
-  )
+        (if (ok? res) (f (result->val res)) res)
+      )
+   )
 )
-
 
 (define make-dict
   (lambda ()
@@ -141,3 +140,16 @@
     (if (dict? dict) (make-ok (make-dict-from-pairs (filter-dict-rec (cdr dict) pred))) (make-error "ERROR on procedure filter-dict: not a dict"))
   )
 )
+
+
+
+
+
+
+
+
+
+
+
+
+

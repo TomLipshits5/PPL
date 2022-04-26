@@ -73,6 +73,7 @@ describe('Q4 Tests', () => {
         expect(evalP(`(L3` + q2 + `(define r3 'error) (ok? r3)` + `)`)).to.deep.equal(makeOk(false));
         expect(evalP(`(L3` + q2 + `(define r3 'error) (error? r3)` + `)`)).to.deep.equal(makeOk(false));
         expect(evalP(`(L3` + q2 + `(define r3 'error) (result? r3)` + `)`)).to.deep.equal(makeOk(false));
+        console.log("PASSED Q2.1 A TESTS!!")
     });
 
     /**
@@ -82,6 +83,7 @@ describe('Q4 Tests', () => {
         expect(evalP(`(L3` + q2 + q2_test_string + `3)`)).to.deep.equal(makeOk(3));
         expect(evalP(`(L3` + q2 + q2_test_string + `(result->val (inverse-square-inverse 2))` + `)`)).to.deep.equal(makeOk(4));
         expect(evalP(`(L3` + q2 + q2_test_string + `(result->val (inverse-square-inverse 0))` + `)`)).to.deep.equal(makeOk("div by 0"));
+        console.log("PASSED Q2.1 B TESTS!!")
     });
 
     /**
@@ -96,6 +98,7 @@ describe('Q4 Tests', () => {
         expect(evalP(`(L3` + q2 + q2_test_string + `(define dict (make-dict)) (result->val (get (result->val (put dict 3 4)) 4))` + `)`)).to.deep.equal(makeOk("Key not found"));
         expect(evalP(`(L3` + q2 + q2_test_string + `(define dict (make-dict)) (result->val (put '(1 2) 3 4))` + `)`)).to.deep.equal(makeOk("Error: not a dictionary"));
         expect(evalP(`(L3` + q2 + q2_test_string + `(define dict (make-dict)) (result->val (get '(1 2) 1))` + `)`)).to.deep.equal(makeOk("Error: not a dictionary"));
+        console.log("PASSED Q2.2 TESTS!!")
     });
 
     /**
@@ -104,6 +107,7 @@ describe('Q4 Tests', () => {
     it("Q23a", () => {
         expect(evalP(`(L3` + q2 + q2_test_string + `(result->val (get (result->val (map-dict (result->val (put (result->val (put (make-dict) 1 #t)) 2 #f)) (lambda (x) (not x )))) 1))` + `)`)).to.deep.equal(makeOk(false));
         expect(evalP(`(L3` + q2 + q2_test_string + `(result->val (get (result->val (map-dict (result->val (put (result->val (put (make-dict) 1 #t)) 2 #f)) (lambda (x) (not x )))) 2))` + `)`)).to.deep.equal(makeOk(true));
+        console.log("PASSED Q2.3 A TESTS!!")
     });
     
 
@@ -113,6 +117,9 @@ describe('Q4 Tests', () => {
     it("Q23b", () => {
         expect(evalP(`(L3` + q2 + q2_test_string + `(result->val (get (result->val (filter-dict (result->val (put (result->val (put (make-dict) 2 3)) 3 4)) (lambda (x y) (< (+ x y) 6)))) 2))` + `)`)).to.deep.equal(makeOk(3));
         expect(evalP(`(L3` + q2 + q2_test_string + `(result->val (get (result->val (filter-dict (result->val (put (result->val (put (make-dict) 2 3)) 3 4)) (lambda (x y) (< (+ x y) 6)))) 3))` + `)`)).to.deep.equal(makeOk("Key not found"));
+        console.log("PASSED Q2.3 B TESTS!!")
     });
+
+    console.log("PASSED ALL TESTS!!")
 
 });
