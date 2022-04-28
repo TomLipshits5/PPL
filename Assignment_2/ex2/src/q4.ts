@@ -1,9 +1,9 @@
-import {BoolExp, Exp, Program, CExp, isProgram, isDefineExp, AppExp, parseL3Exp, parseL3} from '../imp/L3-ast';
-import {Result, makeFailure, makeOk, isOk, mapResult, bind} from '../shared/result';
+import {BoolExp, Exp, Program, isProgram, isDefineExp, AppExp} from '../imp/L3-ast';
+import {Result, makeOk, isOk} from '../shared/result';
 import {
     Binding,
     IfExp, isAppExp,
-    isBoolExp, isCompoundExp, isIfExp, isLetExp, isLitExp,
+    isBoolExp, isIfExp, isLetExp, isLitExp,
     isNumExp,
     isPrimOp, isProcExp,
     isStrExp,
@@ -12,11 +12,10 @@ import {
     PrimOp, ProcExp,
     StrExp,
     VarDecl,
-    VarRef
+
 } from "./L31-ast";
-import {isClosure, isEmptySExp, isSymbolSExp, SExpValue, valueToString} from "../imp/L3-value";
-import {map, not, of} from "ramda";
-import { parse as p, isSexpString, isToken } from "../shared/parser";
+import {isSymbolSExp, SExpValue} from "../imp/L3-value";
+import {map} from "ramda";
 
 /*
 Purpose: Transform L3 AST to JavaScript program string
@@ -24,9 +23,9 @@ Signature: l30ToJS(l2AST)
 Type: [EXP | Program] => Result<string>
 */
 export const l30ToJS = (exp: Exp | Program): Result<string>  =>
-    makeOk(l30tojsString(exp))
+    makeOk(l30ToJSString(exp))
 
-const l30tojsString = (exp: Exp | Program): string =>
+const l30ToJSString = (exp: Exp | Program): string =>
     isBoolExp(exp) ? convertBoolToJS(exp):
     isNumExp(exp) ? convertNumToJS(exp):
     isStrExp(exp) ? convertStringToJS(exp):
@@ -34,12 +33,12 @@ const l30tojsString = (exp: Exp | Program): string =>
     isPrimOp(exp) ? convertPrimOpToJS(exp):
     isIfExp(exp) ? convertIfExpToJs(exp):
     isAppExp(exp) ? convertAppExpToJS(exp):
-    isDefineExp(exp) ? `const ${exp.var.var} = ${l30tojsString(exp.val)}`:
-    isLetExp(exp) ? l30tojsString(rewriteLet(exp)):
+    isDefineExp(exp) ? `const ${exp.var.var} = ${l30ToJSString(exp.val)}`:
+    isLetExp(exp) ? l30ToJSString(rewriteLet(exp)):
     isProcExp(exp) ? convertProcExpToJS(exp):
     isLitExp(exp) ? convertLitExpToJS(exp):
     isProgram(exp) ? convertLExpToJS(exp.exps).join(";\n"):
-    "shit"
+    ""
 
 
 const convertBoolToJS = (bool: BoolExp): string => bool.val  ? "true" : "false";
@@ -68,9 +67,9 @@ const convertPrimOpToJS = (op: PrimOp): string =>
 
 // @ts-ignore
 //TODO: remove amd solve ts ignore
-const convertIfExpToJs = (exp: IfExp): string => `(${(l30tojsString(exp.test))} ? ${(l30tojsString(exp.then))} : ${(l30tojsString(exp.alt))})`
+const convertIfExpToJs = (exp: IfExp): string => `(${(l30ToJSString(exp.test))} ? ${(l30ToJSString(exp.then))} : ${(l30ToJSString(exp.alt))})`
 const convertResultToString = (res: Result<string>): string => isOk(res) ? res.value : res.message
-const convertLExpToJS = (les: Exp[]): string[] => map(l30tojsString, les)
+const convertLExpToJS = (les: Exp[]): string[] => map(l30ToJSString, les)
 // @ts-ignore
 //TODO: remove amd solve ts ignore
 const convertProcExpToJS = (pe: ProcExp):string => `((${map((p:VarDecl)=>p.var,pe.args)}) => ${convertLExpToJS(pe.body)})`
