@@ -250,8 +250,7 @@ const parseLetExp = (bindings: Sexp, body: Sexp[]): Result<LetExp> => {
                             makeLetExp(bindings, body)));
 }
 
-//TODO: implemnt the parseLetPlusExp
-const parseLetPlusExp = (bindings: Sexp, body: Sexp[]): Result<LetExp> => {
+const parseLetPlusExp = (bindings: Sexp, body: Sexp[]): Result<LetPlusExp> => {
     if (!isGoodBindings(bindings)) {
         return makeFailure('Malformed bindings in "let" expression');
     }
@@ -263,8 +262,9 @@ const parseLetPlusExp = (bindings: Sexp, body: Sexp[]): Result<LetExp> => {
     const bindingsResult = mapv(valsResult, (vals: CExp[]) => zipWith(makeBinding, vars, vals));
     return bind(bindingsResult, (bindings: Binding[]) =>
         mapv(mapResult(parseL31CExp, body), (body: CExp[]) =>
-            makeLetExp(bindings, body)));
+            makeLetPlusExp(bindings, body)));
 }
+
 
 // sexps has the shape (quote <sexp>)
 export const parseLitExp = (param: Sexp): Result<LitExp> =>
