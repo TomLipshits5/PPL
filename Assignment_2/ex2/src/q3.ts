@@ -1,18 +1,14 @@
 import {
-    AppExp,
-    Binding,
+    AppExp, ProcExp,
+    Binding, LetExp,
     CExp, DefineExp,
-    Exp, IfExp, isAppExp, isAtomicExp, isCExp, isDefineExp,
-    isExp, isIfExp, isLetExp,
-    isLetPlusExp, isLitExp, isProcExp, isProgram,
-    LetExp,
-    LetPlusExp, makeAppExp, makeDefineExp, makeIfExp,
-    makeLetExp,
-    makeLetPlusExp, makeProcExp, makeProgram,
-    parseL31, ProcExp,
-    Program, unparseL31
+    Exp, IfExp, Program,
+    isAppExp, isAtomicExp, isCExp, isDefineExp, isExp,
+    isIfExp, isLetPlusExp, isLitExp, isProcExp, isProgram,
+    makeAppExp, makeDefineExp, makeIfExp,
+    makeLetExp, makeProcExp, makeProgram,
 } from "./L31-ast";
-import {Result, makeFailure, makeOk, bind} from "../shared/result";
+import {Result, makeOk} from "../shared/result";
 import {map} from "ramda"
 
 
@@ -34,25 +30,27 @@ const L31toL3Program = (exp: Exp | Program): Exp | Program =>
 
 const reWriteAllLetExp = (exp: Exp):Exp =>
     isCExp(exp) ? reWriteAllLetCExp(exp):
-    isDefineExp(exp) ? reWriteAllLetDefine(exp):
+    isDefineExp(exp) ? reWriteAllLetPlusDefineExp(exp):
     exp
 
-const reWriteAllLetDefine = (exp: DefineExp): DefineExp => makeDefineExp(exp.var, reWriteAllLetCExp(exp.val))
-const reWriteAllLetIfExp = (exp: IfExp): IfExp => makeIfExp(reWriteAllLetCExp(exp.test),reWriteAllLetCExp(exp.then),reWriteAllLetCExp(exp.alt))
-const reWriteAllLetAppExp = (exp: AppExp):AppExp => makeAppExp(reWriteAllLetCExp(exp.rator), map(reWriteAllLetCExp, exp.rands))
-const reWriteAllLetProc = (exp: ProcExp):ProcExp => makeProcExp(exp.args, map(reWriteAllLetCExp, exp.body))
+const reWriteAllLetPlusDefineExp = (exp: DefineExp): DefineExp => makeDefineExp(exp.var, reWriteAllLetCExp(exp.val))
+const reWriteAllLetPlusIfExp = (exp: IfExp): IfExp => makeIfExp(reWriteAllLetCExp(exp.test),reWriteAllLetCExp(exp.then),reWriteAllLetCExp(exp.alt))
+const reWriteAllLetPlusAppExp = (exp: AppExp):AppExp => makeAppExp(reWriteAllLetCExp(exp.rator), map(reWriteAllLetCExp, exp.rands))
+const reWriteAllLetPlusProcExp = (exp: ProcExp):ProcExp => makeProcExp(exp.args, map(reWriteAllLetCExp, exp.body))
+
 const reWriteAllLetCExp = (exp: CExp): CExp =>
     isAtomicExp(exp) ? exp:
     isLitExp(exp) ? exp:
-    isIfExp(exp) ? reWriteAllLetIfExp(exp):
-    isAppExp(exp) ? reWriteAllLetAppExp(exp):
-    isProcExp(exp) ? reWriteAllLetProc(exp):
-    isLetPlusExp(exp) ? convertLetPlusExpToLetExp(exp.bindings, exp.body):
+    isIfExp(exp) ? reWriteAllLetPlusIfExp(exp):
+    isAppExp(exp) ? reWriteAllLetPlusAppExp(exp):
+    isProcExp(exp) ? reWriteAllLetPlusProcExp(exp):
+    isLetPlusExp(exp) ? reWriteAllLetPlusExp(exp.bindings, exp.body):
     exp
 
 
-const convertLetPlusExpToLetExp = (bindings:Binding[], body: CExp[]):LetExp =>
+
+const reWriteAllLetPlusExp = (bindings:Binding[], body: CExp[]):LetExp =>
     bindings.length == 1 ? makeLetExp(bindings,body) :
-    makeLetExp([bindings[0]], [convertLetPlusExpToLetExp(bindings.slice(1), body)])
+    makeLetExp([bindings[0]], [reWriteAllLetPlusExp(bindings.slice(1), body)])
 
 
