@@ -1,18 +1,13 @@
-import {BoolExp, Exp, Program, isProgram, isDefineExp, AppExp} from '../imp/L3-ast';
 import {Result, makeOk, isOk} from '../shared/result';
 import {
-    Binding,
-    IfExp, isAppExp,
-    isBoolExp, isIfExp, isLetExp, isLitExp,
-    isNumExp,
-    isPrimOp, isProcExp,
-    isStrExp,
-    isVarRef, LetExp, LitExp, makeAppExp, makeProcExp,
-    NumExp,
-    PrimOp, ProcExp,
-    StrExp,
-    VarDecl,
-
+    BoolExp, Exp, Program,  AppExp,
+    Binding, LetExp, LitExp,
+    NumExp, PrimOp, ProcExp,
+    StrExp, VarDecl, IfExp,
+    isAppExp, isBoolExp, isIfExp, isLetExp, isLitExp,
+    isNumExp, isProgram, isDefineExp,
+    isPrimOp, isProcExp, isStrExp,
+    isVarRef,  makeAppExp, makeProcExp,
 } from "./L31-ast";
 import {isSymbolSExp, SExpValue} from "../imp/L3-value";
 import {map} from "ramda";
@@ -65,13 +60,10 @@ const convertPrimOpToJS = (op: PrimOp): string =>
     op.op
 
 
-// @ts-ignore
-//TODO: remove amd solve ts ignore
-const convertIfExpToJs = (exp: IfExp): string => `(${(l30ToJSString(exp.test))} ? ${(l30ToJSString(exp.then))} : ${(l30ToJSString(exp.alt))})`
+
+const convertIfExpToJs = (exp: IfExp): string => `(${l30ToJSString(exp.test)} ? ${l30ToJSString(exp.then)} : ${l30ToJSString(exp.alt)})`
 const convertResultToString = (res: Result<string>): string => isOk(res) ? res.value : res.message
 const convertLExpToJS = (les: Exp[]): string[] => map(l30ToJSString, les)
-// @ts-ignore
-//TODO: remove amd solve ts ignore
 const convertProcExpToJS = (pe: ProcExp):string => `((${map((p:VarDecl)=>p.var,pe.args)}) => ${convertLExpToJS(pe.body)})`
 const rewriteLet = (e: LetExp): AppExp => {
     const vars = map((b: Binding) => b.var, e.bindings);
