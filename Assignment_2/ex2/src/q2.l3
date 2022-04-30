@@ -95,7 +95,7 @@
     (if (eq? (car(car dict)) k)
         (make-ok(cdr(car dict)))
         (if (empty? (cdr dict))
-            (make-ok "Key not found")
+            (make-error "Key not found")
         (get-rec (cdr dict) k)
 
         )
