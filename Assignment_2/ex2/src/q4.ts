@@ -1,4 +1,4 @@
-import {Result, makeOk, isOk} from '../shared/result';
+import {Result, makeOk} from '../shared/result';
 import {
     BoolExp, Exp, Program,  AppExp,
     Binding, LetExp, LitExp,
@@ -59,10 +59,7 @@ const convertPrimOpToJS = (op: PrimOp): string =>
     op.op === "or" ? "||" :
     op.op
 
-
-
 const convertIfExpToJs = (exp: IfExp): string => `(${l30ToJSString(exp.test)} ? ${l30ToJSString(exp.then)} : ${l30ToJSString(exp.alt)})`
-const convertResultToString = (res: Result<string>): string => isOk(res) ? res.value : res.message
 const convertLExpToJS = (les: Exp[]): string[] => map(l30ToJSString, les)
 const convertProcExpToJS = (pe: ProcExp):string => `((${map((p:VarDecl)=>p.var,pe.args)}) => ${convertLExpToJS(pe.body)})`
 const rewriteLet = (e: LetExp): AppExp => {
@@ -76,12 +73,10 @@ const convertSExpValuetoJS = (exp: SExpValue): string =>
     isSymbolSExp(exp) ? exp.val :
     typeof(exp) === "number" ||typeof(exp) === "string" ||typeof(exp) === "boolean" ? exp.toString(): ""
 
-
-
 const convertAppExpToJS = (exp:AppExp):string => isPrimOp(exp.rator) ?
     handelPrimOp(exp):
     isProcExp(exp.rator) ? `${convertProcExpToJS(exp.rator)}(${convertLExpToJS(exp.rands)})`:
-    isVarRef(exp.rator) ? `${exp.rator.var}(${convertLExpToJS(exp.rands)})`: "weird app expretion"
+    isVarRef(exp.rator) ? `${exp.rator.var}(${convertLExpToJS(exp.rands)})`: "never"
 
 
 //TODO delete from here
