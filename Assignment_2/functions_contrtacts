@@ -1,0 +1,103 @@
+functions contrtacts:
+
+make-ok:
+Signature: make-ok(val)
+Purpose: gets a value and encapsulates it as an ok structure of type result returned pair
+Type: Any -> Ok
+Pre-conditions: 
+Test: (make-ok 3) => ("ok". 3)
+  
+make-error:
+Signature: make-error(msg)
+Purpose: - gets an error string and encapsulates it as an ‘error’ structure of type
+result
+Type: String -> EROOR
+Pre-conditions: 
+Test: (make-error "this is an error msg") => ("error". "this is an error msg")
+
+ok?:
+Signature: ok?(x)
+Purpose: To find if x is an object of type Ok
+Type: Any -> Boolean
+Pre-conditions:
+Test: (ok? (make-ok 3)) => #t
+
+error?:
+Signature: error?(x)
+Purpose: To find if x is an object of type Error
+Type: Any -> Boolean
+Pre-conditions:
+Test: (error? (make-error "this is an error msg")) => #t
+
+result?:
+Signature: result?(x)
+Purpose: To find if x is an object of type Result(Ok|Error)
+Type: Any -> Boolean
+Pre-conditions:
+Test: (result? (make-error "this is an error msg")) => #t
+	  (result? (make-ok 3)) => #t
+
+result->val:
+signature: result->val(res)
+Purpose: returns the encapsulated value of a given result: value for ok result,
+and the error string for error result
+Type: Result -> Any
+Pre-conditions: (result? res) => #t
+Test: (result->val(make-ok 3)) => 3
+
+bind:
+signature: bind(f, res)
+Purpose: Apply the function f on the value of res if res is an Ok, otherwise do nothing
+Type: (Lambda, Result) -> Any || Error
+Pre-conditions: (result? res) => #t, f.Type = typeof(res.val) -> Any
+Test: ((bind (lambda (x) (* x x))) (make-ok 3)) => 9
+
+make-dict:
+signature: make-dict()
+Purpose: Create new empty dictionary
+Type: Any -> Dict
+Pre-conditions:
+Test: (make-dict) => (("dict" . "dict"))
+
+dict?
+signature: dict?(dict)
+Purpose: Find if dict is an object of type Dict
+Type: Any -> Boolean
+Pre-conditions: 
+Test: (dict? (make-dict)) => #t
+
+put:
+signature: put(dict, k, v)
+Purpose: Add the pair (k, v) to the dictionary dict or change the value of the key k to v if k allready in dict
+Type:(Dict, Any, Any) -> Ok<Dict> || Error<"Error: not a dictionary">
+Pre-conditions: (dict? dict) => #t
+Test:(put (make-dict) "grade" 100) => "(ok" . (("dict" . dict)("grade" . 100)))
+
+get:
+signature: get(dict, k)
+Purpose: Returns the value in dict assigned to the given key as an
+ok result. In case the given key is not defined in dict, an error result wii be returned 
+Type: (Dict, Any) -> Ok<Any> || Ok<"Key not found"> || Error<"Error: not a dictionary">
+Pre-conditions: (dict? dict) => #t
+Test: (get (result->val(put (make-dict) "grade" 100)) "grade") => ("ok" . 100)
+
+map-dict:
+signature: map-dict(dict, f)
+Purpose: Apply the function f to any value v in dictionary dict and return a result with the new dict with the same keys and the new values.
+Type: (Dict, Lambda) -> Ok<Dict> || Error<"Error: not a dictionary">
+Pre-conditions: (dict? dict) => #t, f.Type == typeof((get dict k)) for all k in dict
+Test: (map-dict (result->val (put(result->val (put (make-dict) "a" 2)) "b" 4)) (lambda (x) (* x x ))) => ("ok" ("dict" . "dict") ("a" . 4) ("b" . 16))
+
+filter-dict:
+signature: filter-dict(dict, pred)
+Purpose: Returns a result with a new dictionary from dict with the pairs (k v) that satisfies pred.
+Type: (Dict, Lambda) -> Ok<Dict> || Error<"Error: not a dictionary">
+Pre-conditions: (dict? dict) => #t, pred.Type == (typeof(k), typeof(v)) -> Boolean for all (k v) in dict
+Test: (filter-dict (result->val (put(result->val (put (make-dict) "a" 2)) "b" 4)) (lambda (x y) (> y 3)))=> ("ok" ("dict" . "dict") ("b" . 4))
+
+
+
+
+
+
+
