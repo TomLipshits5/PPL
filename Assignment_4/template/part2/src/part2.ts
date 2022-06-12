@@ -129,13 +129,27 @@ export async function constructObjectFromTables(tables: TableServiceTable, ref: 
 
 export function lazyProduct<T1, T2>(g1: () => Generator<T1>, g2: () => Generator<T2>): () => Generator<[T1, T2]> {
     return function* () {
-        // TODO implement!
+        let arr :(T1 | T2)[][] = []
+        for(let x of g1()) {
+            for(let y of g2()){
+                arr.push([x,y])
+                yield [x,y]
+            }
+        }
     }
 }
 
 export function lazyZip<T1, T2>(g1: () => Generator<T1>, g2: () => Generator<T2>): () => Generator<[T1, T2]> {
     return function* () {
-        // TODO implement!
+        let gen1 = g1()
+        let gen2 = g2()
+        let y : T2
+        let arr :(T1 | T2)[][] = []
+        for(let x of gen1) {
+            y = gen2.next().value
+            arr.push([x,y])
+            yield [x,y]
+        }
     }
 }
 
@@ -149,22 +163,24 @@ export type ReactiveTableService<T> = {
 
 export async function makeReactiveTableService<T>(sync: (table?: Table<T>) => Promise<Table<T>>, optimistic: boolean): Promise<ReactiveTableService<T>> {
     // optional initialization code
-    let _observer: (table: Table<T>) => void
+    let _observer: ((table: Table<T>) => void)[] = []
     let _table = await sync()
 
-
+    const observe = (table: Table<T>):void => {
+        for (const observer of _observer){
+            observer(table)
+        }
+    }
 
 
     const handleMutation = async (newTable: Table<T>) => {
         try{
             _table = await sync(newTable)
-            if (!optimistic && _observer != null){
-                _observer(newTable)
+            if (!optimistic){
+                observe(newTable)
             }
         }catch (err) {
-            if(_observer != null){
-                _observer(_table)
-            }
+            observe(_table)
             return Promise.reject(err)
         }
     }
@@ -181,8 +197,8 @@ export async function makeReactiveTableService<T>(sync: (table?: Table<T>) => Pr
             try{
                 Object.assign(record, _table)
                 record[key] = val
-                if (optimistic && _observer != null){
-                    _observer(record)
+                if (optimistic){
+                    observe(record)
                 }
                 return handleMutation(record)
             }catch(err){
@@ -198,8 +214,8 @@ export async function makeReactiveTableService<T>(sync: (table?: Table<T>) => Pr
                         filtered[currKey] = val
                     }
                 }
-                if (optimistic && _observer != null){
-                    _observer(filtered)
+                if (optimistic){
+                    observe(filtered)
                 }
                 return handleMutation(filtered)
             }catch(err){
@@ -208,7 +224,7 @@ export async function makeReactiveTableService<T>(sync: (table?: Table<T>) => Pr
         },
 
         subscribe(observer: (table: Table<T>) => void): void {
-            _observer = observer
+            _observer.push(observer)
         }
     }
 }

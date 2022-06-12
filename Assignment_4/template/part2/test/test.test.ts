@@ -38,131 +38,131 @@ function makeFailingSync<T>(innerTable: Table<T>) {
 }
 
 describe('Assignment 4 Part 2', () => {
-    // describe('Q2.1 (11pts)', () => {
-    //     type Book = {
-    //         title: string,
-    //         author: string,
-    //     }
-    //
-    //     const templateBookTable = Object.freeze({
-    //         'A': {title: 'title_B', author: 'author_A'},
-    //         'B': {title: 'title_B', author: 'author_B'}
-    //     } as Table<Book>)
-    //
-    //     const exampleBookSync = makeSimpleSync<Book>()
-    //     let service: TableService<Book> = null!
-    //     beforeEach(async () => {
-    //         await exampleBookSync({...templateBookTable})
-    //         service = makeTableService<Book>(exampleBookSync)
-    //     })
-    //
-    //     test('stores and retrieves value', async () => {
-    //         const B = await service.get('B')
-    //         expect(B).toEqual(templateBookTable['B'])
-    //         await service.set('C', {title: 'title_C', author: 'author_C'})
-    //         const C = await service.get('C')
-    //         expect(C).toEqual({title: 'title_C', author: 'author_C'})
-    //         expect(B).toEqual(templateBookTable['B'])
-    //         await service.delete('C')
-    //         await expect(service.get('C')).rejects.toEqual(MISSING_KEY)
-    //         await expect(service.delete('C')).rejects.toEqual(MISSING_KEY)
-    //
-    //     })
-    //
-    //     test('throws on missing key (get)', async () => {
-    //         await expect(service.get('C')).rejects.toEqual(MISSING_KEY)
-    //     })
-    //
-    //     test('getAll retrieves an array', async () => {
-    //         expect(await getAll(service, ['A', 'B'])).toEqual(Object.values(templateBookTable))
-    //     })
-    //
-    //     test('getAll throws on missing value', async () => {
-    //         await expect(getAll(service, ['A', 'C'])).rejects.toEqual(MISSING_KEY)
-    //     })
-    // })
-    //
-    // describe('Q2.2 (12pts)', () => {
-    //     type Author = {
-    //         firstName: string,
-    //         lastName: string,
-    //     }
-    //     type Book = {
-    //         title: string,
-    //         author: { table: 'authors', key: string },
-    //     }
-    //
-    //
-    //     const exampleAuthorSync = makeSimpleSync<Author>()
-    //     const exampleBookSync = makeSimpleSync<Book>()
-    //     let authorService: TableService<Author> = null!
-    //     let bookService: TableService<Book> = null!
-    //     let allServices: TableServiceTable = null!
-    //
-    //     beforeEach(async () => {
-    //         await exampleAuthorSync({
-    //             'A': {firstName: 'f_a', lastName: 'l_a'},
-    //             'B': {firstName: 'f_b', lastName: 'l_b'}
-    //         })
-    //         authorService = makeTableService<Author>(exampleAuthorSync)
-    //
-    //         await exampleBookSync({
-    //             'A': {title: 'title_A', author: {table: 'authors', key: 'A'}},
-    //             'B': {title: 'title_B', author: {table: 'authors', key: 'B'}}
-    //         })
-    //         bookService = makeTableService<Book>(exampleBookSync)
-    //
-    //         allServices = {
-    //             'authors': authorService,
-    //             'books': bookService,
-    //         }
-    //     })
-    //
-    //     test('can reconstruct object', async () => {
-    //         const obj = await constructObjectFromTables(allServices, {table: 'books', key: 'A'})
-    //         expect(obj).toEqual({title: 'title_A', author: {firstName: 'f_a', lastName: 'l_a'}})
-    //     })
-    //
-    //     test('throws on missing table', async () => {
-    //         await expect(constructObjectFromTables(allServices, {table: 'books2', key: 'A'})).rejects.toEqual(MISSING_TABLE_SERVICE)
-    //     })
-    //
-    //     test('throws on missing key first key', async () => {
-    //         await expect(constructObjectFromTables(allServices, {table: 'books', key: 'C'})).rejects.toEqual(MISSING_KEY)
-    //     })
-    //
-    //
-    //     test('throws on missing key second key', async () => {
-    //         let booksService = allServices["books"]
-    //         await booksService.set('A',  {title: 'title_A', author: {table: 'authors', key: 'C'}})
-    //         await expect(constructObjectFromTables(allServices, {table: 'books', key: 'A'})).rejects.toEqual(MISSING_KEY)
-    //     })
-    // })
+    describe('Q2.1 (11pts)', () => {
+        type Book = {
+            title: string,
+            author: string,
+        }
 
-    // describe('Q2.3 (10pts)', () => {
-    //     function countTo(n: number) {
-    //         return function* (): Generator<number> {
-    //             for (let i = 1; i <= n; i++) {
-    //                 yield i
-    //             }
-    //         }
-    //     }
-    //
-    //     test('lazyProduct', () => {
-    //         const gen = lazyProduct(countTo(2), countTo(3))()
-    //
-    //         expect([...gen]).toEqual(
-    //             [[1, 1], [1, 2], [1, 3],
-    //                 [2, 1], [2, 2], [2, 3]])
-    //     })
-    //
-    //     test('lazyZip', () => {
-    //         const gen = lazyZip(countTo(2), countTo(2))()
-    //
-    //         expect([...gen]).toEqual([[1, 1], [2, 2]])
-    //     })
-    // })
-    //
+        const templateBookTable = Object.freeze({
+            'A': {title: 'title_B', author: 'author_A'},
+            'B': {title: 'title_B', author: 'author_B'}
+        } as Table<Book>)
+
+        const exampleBookSync = makeSimpleSync<Book>()
+        let service: TableService<Book> = null!
+        beforeEach(async () => {
+            await exampleBookSync({...templateBookTable})
+            service = makeTableService<Book>(exampleBookSync)
+        })
+
+        test('stores and retrieves value', async () => {
+            const B = await service.get('B')
+            expect(B).toEqual(templateBookTable['B'])
+            await service.set('C', {title: 'title_C', author: 'author_C'})
+            const C = await service.get('C')
+            expect(C).toEqual({title: 'title_C', author: 'author_C'})
+            expect(B).toEqual(templateBookTable['B'])
+            await service.delete('C')
+            await expect(service.get('C')).rejects.toEqual(MISSING_KEY)
+            await expect(service.delete('C')).rejects.toEqual(MISSING_KEY)
+
+        })
+
+        test('throws on missing key (get)', async () => {
+            await expect(service.get('C')).rejects.toEqual(MISSING_KEY)
+        })
+
+        test('getAll retrieves an array', async () => {
+            expect(await getAll(service, ['A', 'B'])).toEqual(Object.values(templateBookTable))
+        })
+
+        test('getAll throws on missing value', async () => {
+            await expect(getAll(service, ['A', 'C'])).rejects.toEqual(MISSING_KEY)
+        })
+    })
+
+    describe('Q2.2 (12pts)', () => {
+        type Author = {
+            firstName: string,
+            lastName: string,
+        }
+        type Book = {
+            title: string,
+            author: { table: 'authors', key: string },
+        }
+
+
+        const exampleAuthorSync = makeSimpleSync<Author>()
+        const exampleBookSync = makeSimpleSync<Book>()
+        let authorService: TableService<Author> = null!
+        let bookService: TableService<Book> = null!
+        let allServices: TableServiceTable = null!
+
+        beforeEach(async () => {
+            await exampleAuthorSync({
+                'A': {firstName: 'f_a', lastName: 'l_a'},
+                'B': {firstName: 'f_b', lastName: 'l_b'}
+            })
+            authorService = makeTableService<Author>(exampleAuthorSync)
+
+            await exampleBookSync({
+                'A': {title: 'title_A', author: {table: 'authors', key: 'A'}},
+                'B': {title: 'title_B', author: {table: 'authors', key: 'B'}}
+            })
+            bookService = makeTableService<Book>(exampleBookSync)
+
+            allServices = {
+                'authors': authorService,
+                'books': bookService,
+            }
+        })
+
+        test('can reconstruct object', async () => {
+            const obj = await constructObjectFromTables(allServices, {table: 'books', key: 'A'})
+            expect(obj).toEqual({title: 'title_A', author: {firstName: 'f_a', lastName: 'l_a'}})
+        })
+
+        test('throws on missing table', async () => {
+            await expect(constructObjectFromTables(allServices, {table: 'books2', key: 'A'})).rejects.toEqual(MISSING_TABLE_SERVICE)
+        })
+
+        test('throws on missing key first key', async () => {
+            await expect(constructObjectFromTables(allServices, {table: 'books', key: 'C'})).rejects.toEqual(MISSING_KEY)
+        })
+
+
+        test('throws on missing key second key', async () => {
+            let booksService = allServices["books"]
+            await booksService.set('A',  {title: 'title_A', author: {table: 'authors', key: 'C'}})
+            await expect(constructObjectFromTables(allServices, {table: 'books', key: 'A'})).rejects.toEqual(MISSING_KEY)
+        })
+    })
+
+    describe('Q2.3 (10pts)', () => {
+        function countTo(n: number) {
+            return function* (): Generator<number> {
+                for (let i = 1; i <= n; i++) {
+                    yield i
+                }
+            }
+        }
+
+        test('lazyProduct', () => {
+            const gen = lazyProduct(countTo(2), countTo(3))()
+
+            expect([...gen]).toEqual(
+                [[1, 1], [1, 2], [1, 3],
+                    [2, 1], [2, 2], [2, 3]])
+        })
+
+        test('lazyZip', () => {
+            const gen = lazyZip(countTo(2), countTo(2))()
+
+            expect([...gen]).toEqual([[1, 1], [2, 2]])
+        })
+    })
+
     describe('Q2.4 (14pts)', () => {
         type Book = {
             title: string,
