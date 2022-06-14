@@ -14,6 +14,10 @@ import { isProcTExp, makeBoolTExp, makeNumTExp, makeProcTExp, makeStrTExp, makeV
          isRecord, ProcTExp, makeUserDefinedNameTExp, Field, makeAnyTExp, isAnyTExp, isUserDefinedNameTExp } from "./TExp";
 import { isEmpty, allT, first, rest, cons } from '../shared/list';
 import { Result, makeFailure, bind, makeOk, zipWithResult, mapv, mapResult, isFailure, either } from '../shared/result';
+import {applyEnv} from "./L5-env";
+import {isNumber} from "util";
+import {Closure, CompoundSExp, isClosure, isEmptySExp, isSymbolSExp, SExpValue} from "./L5-value";
+import {isCompoundSexp} from "../shared/parser";
 
 // L51
 export const getTypeDefinitions = (p: Program): UserDefinedTExp[] => {
@@ -379,13 +383,41 @@ export const typeofProgram = (exp: Program, tenv: TEnv, p: Program): Result<TExp
 export const typeofDefineType = (exp: DefineTypeExp, _tenv: TEnv, _p: Program): Result<TExp> =>
     makeFailure(`Todo ${JSON.stringify(exp, null, 2)}`);
 
-// TODO L51
+// TODO L51:: Completed not tested
 export const typeofSet = (exp: SetExp, _tenv: TEnv, _p: Program): Result<TExp> =>
-    makeFailure(`Todo ${JSON.stringify(exp, null, 2)}`);
+    bind(applyTEnv(_tenv, exp.var.var), (typeOfOriginal: TExp): Result<TExp> =>
+            bind(typeofExp(exp.val, _tenv, _p), (typeOfval: TExp): Result<TExp> =>
+                equals(typeOfval, typeOfOriginal) ? makeOk(typeOfval) :
+                    makeFailure("Variable type is incompatible with set type")
+            )
+    )
 
-// TODO L51
+//type of closure is defined by the type of its last Cexp in the body (its return value)
+const  typeOfClosure = (closure: Closure, tenv: TEnv, p: Program): Result<TExp> =>
+    typeofExp(closure.body[closure.body.length - 1], tenv, p)
+
+
+const typeofCompoundSexp = (val: CompoundSExp, _tenv: TEnv, _p: Program): Result<TExp> =>
+     makeOk(makeVoidTExp())
+
+const typeofSExpValue = (exp: SExpValue, _tenv: TEnv, _p: Program): Result<TExp> =>
+    typeof(exp) == "number" ? makeOk(makeNumTExp()) :
+    typeof(exp) == "boolean" ? makeOk(makeBoolTExp()) :
+    typeof(exp) == "string" ? makeOk(makeStrTExp()) :
+    typeof(exp) == "undefined" ? makeOk(makeVoidTExp()) :
+    isPrimOp(exp) ? typeofPrim(exp) :
+    isSymbolSExp(exp) ? makeOk(makeStrTExp()) :
+    isClosure(exp) ? typeOfClosure(exp, _tenv, _p) :
+    isEmptySExp(exp) ? makeOk(makeVoidTExp()) :
+    isCompoundSexp(exp) ? typeofCompoundSexp(exp, _tenv, _p):
+    makeFailure("Failed in type of Lit");
+
+// TODO L51::Almost done  only handle compoundSexpValue
 export const typeofLit = (exp: LitExp, _tenv: TEnv, _p: Program): Result<TExp> =>
-    makeFailure(`Todo ${JSON.stringify(exp, null, 2)}`);
+       typeofSExpValue(exp.val, _tenv, _p)
+
+
+
 
 // TODO: L51
 // Purpose: compute the type of a type-case
