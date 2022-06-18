@@ -1,12 +1,24 @@
 import { isTypedArray } from 'util/types';
 import { isProgram, parseL51, Program } from '../src/L5/L5-ast';
-import { typeofProgram, L51typeof, initTEnv, getRecords, getTypeDefinitions,
-         checkEqualType, getParentsType, coverTypes, checkCoverType, getUserDefinedTypeByName, mostSpecificType } from '../src/L5/L5-typecheck';
+import {
+    typeofProgram,
+    L51typeof,
+    initTEnv,
+    getRecords,
+    getTypeDefinitions,
+    checkEqualType,
+    getParentsType,
+    coverTypes,
+    checkCoverType,
+    getUserDefinedTypeByName,
+    mostSpecificType,
+    L51typeofProgram, checkUserDefinedTypes
+} from '../src/L5/L5-typecheck';
 import { applyTEnv } from '../src/L5/TEnv';
 import { isNumTExp, isProcTExp, makeBoolTExp, makeNumTExp, makeProcTExp, makeTVar, 
          makeVoidTExp, parseTE, unparseTExp, TExp, makeUserDefinedNameTExp, 
          isUserDefinedTExp, isUserDefinedNameTExp, makeAnyTExp, isAnyTExp, UserDefinedTExp, isTExp } from '../src/L5/TExp';
-import { makeOk, isOkT, bind, mapv, isFailure, Result } from '../src/shared/result';
+import {makeOk, isOkT, bind, mapv, isFailure, Result, isOk} from '../src/shared/result';
 
 describe('L5 Type Checker', () => {
     describe('parseTE', () => {
@@ -153,7 +165,7 @@ describe('L5 Type Checker', () => {
             expect(pp).toSatisfy(isOkT(isProgram));
         });
 
-		// console.log(`${JSON.stringify(pp, null, 2)}`);				
+		// console.log(`${JSON.stringify(pp, null, 2)}`);
 		it('Collects ud types and records', () => {
 			mapv(pp, (p: Program) => {
 				const records = getRecords(p);
@@ -162,7 +174,7 @@ describe('L5 Type Checker', () => {
                 expect(udtypes.length).toBe(2);
 			});
 		});
-		
+
         it('checkEqualType knows about any and subtypes across records and UD types', () => {
             mapv(pp, (p: Program) => {
                 const c1 = checkEqualType(R1, UD, p.exps[2], p);
@@ -229,7 +241,7 @@ describe('L5 Type Checker', () => {
                 expect(mst3).toStrictEqual(UD);
             });
         });
-        
+
         it('compute coverTypes with type names', () => {
             mapv(pp, (p: Program) => {
                 const ct1 : TExp[] = coverTypes([R1, R2], p);
@@ -301,6 +313,41 @@ describe('L5 Type Checker', () => {
 		});
     });
 
+    //this is our test
+    describe('Tools for analysis of UD Types', () => {
+        const p = `(L51
+            (define-type Env
+                (Empty-Env)
+                (Extended-Env (var : string) (val : number) (tail : Env)))
+            (define-type Env2
+                (Empty-Env2)
+                (Extended-Env (var : string) (val : number) (tail : Env)))
+        )`;
+        const pp = parseL51(p);
+        // R1 and R2 are subtypes of UD
+        // circle and rectangle are subtypes of Shape
+        const UD = makeUserDefinedNameTExp('UD');
+        const R1 = makeUserDefinedNameTExp('R1');
+        const R2 = makeUserDefinedNameTExp('R2');
+
+        const Shape = makeUserDefinedNameTExp('Shape');
+        const circle = makeUserDefinedNameTExp('circle');
+
+        it('Parses the program', () => {
+            const pcheck = isOk(pp)?checkUserDefinedTypes(pp.value) : false
+            if(pcheck != false){
+                console.log("in the if statement")
+                console.log(pcheck)
+            }
+        });
+
+
+    });
+
+    //this is our test end
+
+
+
     describe('Type analysis of UD Types - Simple return type', () => {
         const tc1 = `
         (L51 
@@ -318,13 +365,14 @@ describe('L5 Type Checker', () => {
         expect(ptc).toSatisfy(isOkT(isProgram));
         it('analyzes type-case', () => {
             mapv(ptc, (p: Program) => {
+                console.log(initTEnv(p))
                 // console.log(`Parsed program ${JSON.stringify(p, null, 2)}`);
                 const t = typeofProgram(p, initTEnv(p), p);
                 // console.log(`Analyzed type ${JSON.stringify(t, null, 2)}`);
                 expect(t).toSatisfy(isOkT(isTExp));
                 mapv(t, (t1: TExp) => {
                     expect(t1).toSatisfy(isNumTExp);
-                })                
+                })
             })
         });
 	});
@@ -354,7 +402,7 @@ describe('L5 Type Checker', () => {
                 // console.log(`Analyzed type ${JSON.stringify(t, null, 2)}`);
                 mapv(t, (t1: TExp) => {
                     expect(t1).toStrictEqual(circle);
-                })                
+                })
             })
         });
     });
@@ -386,7 +434,7 @@ describe('L5 Type Checker', () => {
                 // console.log(`Analyzed type ${JSON.stringify(t, null, 2)}`);
                 mapv(t, (t1: TExp) => {
                     expect(t1).toStrictEqual(Shape);
-                })                
+                })
             })
         });
     });
