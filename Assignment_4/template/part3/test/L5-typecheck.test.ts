@@ -15,9 +15,12 @@ import {
     L51typeofProgram, checkUserDefinedTypes
 } from '../src/L5/L5-typecheck';
 import { applyTEnv } from '../src/L5/TEnv';
-import { isNumTExp, isProcTExp, makeBoolTExp, makeNumTExp, makeProcTExp, makeTVar, 
-         makeVoidTExp, parseTE, unparseTExp, TExp, makeUserDefinedNameTExp, 
-         isUserDefinedTExp, isUserDefinedNameTExp, makeAnyTExp, isAnyTExp, UserDefinedTExp, isTExp } from '../src/L5/TExp';
+import {isTrueValue} from '../../../../Assignment_2/ex2/imp/L3-eval'
+import {
+    isNumTExp, isProcTExp, makeBoolTExp, makeNumTExp, makeProcTExp, makeTVar,
+    makeVoidTExp, parseTE, unparseTExp, TExp, makeUserDefinedNameTExp,
+    isUserDefinedTExp, isUserDefinedNameTExp, makeAnyTExp, isAnyTExp, UserDefinedTExp, isTExp, makeStrTExp
+} from '../src/L5/TExp';
 import {makeOk, isOkT, bind, mapv, isFailure, Result, isOk} from '../src/shared/result';
 
 describe('L5 Type Checker', () => {
@@ -136,8 +139,13 @@ describe('L5 Type Checker', () => {
             expect(L51typeof("(define (x : (Empty -> number)) (lambda () : number 1))")).toEqual(makeOk("void"));
         });
 
-        it.skip('returns "literal" as the type for literal expressions', () => {
-            expect(L51typeof("(quote ())")).toEqual(makeOk("literal"));
+        it('returns "literal" as the type for literal expressions', () => {
+            expect(L51typeof("'()")).toEqual(makeOk("void"));
+            expect(L51typeof("'a")).toEqual(makeOk("string"));
+            expect(L51typeof("'3")).toEqual(makeOk("number"));
+            expect(L51typeof("'#t")).toEqual(makeOk("boolean"));
+            // expect(L51typeof("'(cons 1 2)")).toEqual(makeOk("number"));
+
         });
 	});
 
@@ -333,12 +341,10 @@ describe('L5 Type Checker', () => {
         const Shape = makeUserDefinedNameTExp('Shape');
         const circle = makeUserDefinedNameTExp('circle');
 
+        const isTrue = (v:any):v is boolean => v ? v : false
         it('Parses the program', () => {
             const pcheck = isOk(pp)?checkUserDefinedTypes(pp.value) : false
-            if(pcheck != false){
-                console.log("in the if statement")
-                console.log(pcheck)
-            }
+            expect(pcheck).toSatisfy(isOkT((isTrue)))
         });
 
 
@@ -365,7 +371,6 @@ describe('L5 Type Checker', () => {
         expect(ptc).toSatisfy(isOkT(isProgram));
         it('analyzes type-case', () => {
             mapv(ptc, (p: Program) => {
-                console.log(initTEnv(p))
                 // console.log(`Parsed program ${JSON.stringify(p, null, 2)}`);
                 const t = typeofProgram(p, initTEnv(p), p);
                 // console.log(`Analyzed type ${JSON.stringify(t, null, 2)}`);
@@ -475,10 +480,17 @@ describe('L5 Type Checker', () => {
                     (circle (radius : number))
                     (rectangle (width : number)
                             (height : number)))
+                (define-type Function
+                    (circle (radius : number))
+                    (polinom (a : number))
+                )
                 (define (s : circle) (make-circle 1))
+                (define (x : number) 3)
                 (type-case circle s
                     (circle (r) (make-rectangle r r))
-                    (rectangle (w h) (make-circle (+ w h))))
+                    (rectangle (w h) (make-circle (+ w h)))
+                    (polinom (a) (make-circle a))
+                )
             )
             `;
             const ptc = parseL51(tc2);
